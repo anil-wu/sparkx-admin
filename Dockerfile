@@ -13,7 +13,7 @@ RUN npm ci
 COPY . .
 
 # Copy production environment file
-COPY web_admin/.env.production .env
+COPY .env.production .env
 
 # Build the application
 RUN npm run build
