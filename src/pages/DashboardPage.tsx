@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import './DashboardPage.css';
 
 interface AdminInfo {
@@ -122,6 +122,33 @@ export default function DashboardPage() {
                 <span className="stat-label">文件总数</span>
                 <span className="stat-value">--</span>
               </div>
+            </div>
+          </div>
+
+          <div className="management-section">
+            <h3 className="section-title">管理功能</h3>
+            <div className="management-grid">
+              <Link to="/software-templates" className="management-card">
+                <div className="management-icon template-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect width="16" height="20" x="4" y="2" rx="2" ry="2" />
+                    <path d="M9 22v-4h6v4" />
+                    <path d="M8 6h.01" />
+                    <path d="M16 6h.01" />
+                    <path d="M12 6h.01" />
+                    <path d="M12 10h.01" />
+                    <path d="M12 14h.01" />
+                    <path d="M16 10h.01" />
+                    <path d="M16 14h.01" />
+                    <path d="M8 10h.01" />
+                    <path d="M8 14h.01" />
+                  </svg>
+                </div>
+                <div className="management-info">
+                  <span className="management-title">软件模板管理</span>
+                  <span className="management-desc">创建和管理软件模板</span>
+                </div>
+              </Link>
             </div>
           </div>
         </div>

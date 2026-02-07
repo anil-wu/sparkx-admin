@@ -38,7 +38,6 @@ const parseApiErrorMessage = async (response: Response): Promise<string> => {
 };
 
 const API_BASE_URL = import.meta.env.SPARKX_API_BASE_URL || '';
-console.log("API_BASE_URL---->>",API_BASE_URL);
 const adminLogin = async (input: {
   username: string;
   password: string;
