@@ -3,6 +3,7 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import SoftwareTemplatesPage from './pages/SoftwareTemplatesPage';
 import LlmManagementPage from './pages/LlmManagementPage';
+import AgentManagementPage from './pages/AgentManagementPage';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/software-templates" element={<SoftwareTemplatesPage />} />
         <Route path="/llm" element={<LlmManagementPage />} />
+        <Route path="/agents" element={<AgentManagementPage />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
