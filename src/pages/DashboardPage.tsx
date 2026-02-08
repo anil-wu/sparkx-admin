@@ -149,6 +149,21 @@ export default function DashboardPage() {
                   <span className="management-desc">创建和管理软件模板</span>
                 </div>
               </Link>
+
+              <Link to="/llm" className="management-card">
+                <div className="management-icon template-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2a4 4 0 0 0-4 4v3H7a3 3 0 0 0-3 3v4a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-4a3 3 0 0 0-3-3h-1V6a4 4 0 0 0-4-4Z" />
+                    <path d="M9 19v-2" />
+                    <path d="M15 19v-2" />
+                    <path d="M10 13h4" />
+                  </svg>
+                </div>
+                <div className="management-info">
+                  <span className="management-title">大模型管理</span>
+                  <span className="management-desc">配置 Provider/Model 与用量日志</span>
+                </div>
+              </Link>
             </div>
           </div>
         </div>
