@@ -23,6 +23,7 @@ interface Agent {
   id: number;
   name: string;
   description: string;
+  instruction: string;
   agentType: string;
   createdAt: string;
 }
@@ -95,7 +96,7 @@ const listAgents = async (input: { agentType?: string; page: number; pageSize: n
   }
 };
 
-const createAgent = async (input: { name: string; description?: string; agentType: string }): Promise<
+const createAgent = async (input: { name: string; description?: string; instruction?: string; agentType: string }): Promise<
   | { ok: true; data: Agent }
   | { ok: false; message: string }
 > => {
@@ -116,7 +117,10 @@ const createAgent = async (input: { name: string; description?: string; agentTyp
   }
 };
 
-const updateAgent = async (id: number, input: { name?: string; description?: string; agentType?: string }): Promise<
+const updateAgent = async (
+  id: number,
+  input: { name?: string; description?: string; instruction?: string; agentType?: string }
+): Promise<
   | { ok: true }
   | { ok: false; message: string }
 > => {
@@ -335,7 +339,7 @@ export default function AgentManagementPage() {
   const [isAgentModalOpen, setIsAgentModalOpen] = useState(false);
   const [agentModalMode, setAgentModalMode] = useState<'create' | 'edit'>('create');
   const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
-  const [agentForm, setAgentForm] = useState({ name: '', description: '', agentType: 'code' });
+  const [agentForm, setAgentForm] = useState({ name: '', description: '', instruction: '', agentType: 'code' });
 
   const handleLogout = () => {
     localStorage.removeItem('sparkx_admin_token');
@@ -441,7 +445,7 @@ export default function AgentManagementPage() {
     setMessage(null);
     setAgentModalMode('create');
     setEditingAgent(null);
-    setAgentForm({ name: '', description: '', agentType: 'code' });
+    setAgentForm({ name: '', description: '', instruction: '', agentType: 'code' });
     setIsAgentModalOpen(true);
   };
 
@@ -449,14 +453,19 @@ export default function AgentManagementPage() {
     setMessage(null);
     setAgentModalMode('edit');
     setEditingAgent(agent);
-    setAgentForm({ name: agent.name, description: agent.description || '', agentType: agent.agentType || 'code' });
+    setAgentForm({
+      name: agent.name,
+      description: agent.description || '',
+      instruction: agent.instruction || '',
+      agentType: agent.agentType || 'code',
+    });
     setIsAgentModalOpen(true);
   };
 
   const closeAgentModal = () => {
     setIsAgentModalOpen(false);
     setEditingAgent(null);
-    setAgentForm({ name: '', description: '', agentType: 'code' });
+    setAgentForm({ name: '', description: '', instruction: '', agentType: 'code' });
   };
 
   const submitAgent = async () => {
@@ -471,11 +480,12 @@ export default function AgentManagementPage() {
     }
 
     if (agentModalMode === 'create') {
-      const payload: { name: string; description?: string; agentType: string } = {
+      const payload: { name: string; description?: string; instruction?: string; agentType: string } = {
         name: agentForm.name.trim(),
         agentType: agentForm.agentType.trim(),
       };
       if (agentForm.description.trim()) payload.description = agentForm.description.trim();
+      if (agentForm.instruction.trim()) payload.instruction = agentForm.instruction.trim();
       const result = await createAgent(payload);
       if (!result.ok) {
         setMessage({ type: 'error', text: result.message });
@@ -489,9 +499,10 @@ export default function AgentManagementPage() {
     }
 
     if (!editingAgent) return;
-    const payload: { name?: string; description?: string; agentType?: string } = {};
+    const payload: { name?: string; description?: string; instruction?: string; agentType?: string } = {};
     if (agentForm.name.trim() && agentForm.name.trim() !== editingAgent.name) payload.name = agentForm.name.trim();
     if ((agentForm.description || '') !== (editingAgent.description || '')) payload.description = agentForm.description.trim();
+    if ((agentForm.instruction || '') !== (editingAgent.instruction || '')) payload.instruction = agentForm.instruction.trim();
     if (agentForm.agentType.trim() && agentForm.agentType.trim() !== editingAgent.agentType) payload.agentType = agentForm.agentType.trim();
     const result = await updateAgent(editingAgent.id, payload);
     if (!result.ok) {
@@ -723,6 +734,8 @@ export default function AgentManagementPage() {
                     <div className="v">{selectedAgent.createdAt}</div>
                     <div className="k">描述</div>
                     <div className="v">{selectedAgent.description || '--'}</div>
+                    <div className="k">指令</div>
+                    <div className="v">{selectedAgent.instruction || '--'}</div>
                   </div>
 
                   <div className="agent-divider" />
@@ -819,6 +832,11 @@ export default function AgentManagementPage() {
                 <option value="build">build（构建）</option>
                 <option value="ops">ops（运维）</option>
               </select>
+              <input
+                value={agentForm.instruction}
+                onChange={(e) => setAgentForm((s) => ({ ...s, instruction: e.target.value }))}
+                placeholder="指令（可选）"
+              />
               <textarea
                 value={agentForm.description}
                 onChange={(e) => setAgentForm((s) => ({ ...s, description: e.target.value }))}
