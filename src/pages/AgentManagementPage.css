@@ -5,6 +5,12 @@
   color-scheme: light;
 }
 
+.agent-page .header-content,
+.agent-page .dashboard-container {
+  max-width: none;
+  width: 100%;
+}
+
 .agent-page,
 .agent-page * {
   box-sizing: border-box;
@@ -12,7 +18,7 @@
 
 .agent-layout {
   display: grid;
-  grid-template-columns: 380px 1fr;
+  grid-template-columns: 420px 1fr;
   gap: 1.25rem;
 }
 
@@ -317,6 +323,15 @@
   word-break: break-word;
 }
 
+.agent-multiline {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.agent-form textarea.agent-textarea-instruction {
+  min-height: 180px;
+}
+
 .agent-type-badge {
   font-size: 0.8rem;
   font-weight: 600;
@@ -493,15 +508,18 @@
   justify-content: center;
   z-index: 1000;
   backdrop-filter: blur(4px);
+  padding: 1rem;
 }
 
 .agent-modal {
-  width: min(480px, calc(100vw - 2rem));
+  width: min(1200px, 100%);
+  max-height: calc(100vh - 2rem);
   background: white;
   border-radius: 1rem;
   padding: 1.5rem;
   box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
   animation: modalIn 0.2s ease;
+  overflow: auto;
 }
 
 @keyframes modalIn {
@@ -550,8 +568,12 @@
 }
 
 .agent-form textarea {
-  min-height: 80px;
+  min-height: 140px;
   resize: vertical;
+}
+
+.agent-form textarea.agent-textarea-instruction {
+  min-height: 360px;
 }
 
 .agent-modal-actions {

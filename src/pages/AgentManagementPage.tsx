@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './SoftwareTemplatesPage.css';
 import './AgentManagementPage.css';
@@ -275,6 +275,7 @@ const agentTypeLabel = (t: string): string => {
   if (value === 'test') return '测试';
   if (value === 'build') return '构建';
   if (value === 'ops') return '运维';
+  if (value === 'project') return '项目';
   return value || '--';
 };
 
@@ -286,6 +287,7 @@ const agentTypeColor = (t: string): string => {
   if (value === 'test') return '#f59e0b';
   if (value === 'build') return '#10b981';
   if (value === 'ops') return '#6366f1';
+  if (value === 'project') return '#22c55e';
   return '#6b7280';
 };
 
@@ -468,6 +470,61 @@ export default function AgentManagementPage() {
     setAgentForm({ name: '', description: '', instruction: '', agentType: 'code' });
   };
 
+  const stripLineLeadingWhitespace = (value: string, selectionStart: number, selectionEnd: number) => {
+    const length = value.length;
+    const lines: Array<{ start: number; removed: number }> = [];
+    let next = 0;
+    let normalized = '';
+
+    while (next <= length) {
+      const lineStart = next;
+      const newlineIndex = value.indexOf('\n', lineStart);
+      const lineEnd = newlineIndex === -1 ? length : newlineIndex;
+      let removed = 0;
+      while (lineStart + removed < lineEnd) {
+        const ch = value.charCodeAt(lineStart + removed);
+        if (ch !== 32 && ch !== 9) break;
+        removed += 1;
+      }
+
+      lines.push({ start: lineStart, removed });
+      normalized += value.slice(lineStart + removed, lineEnd);
+      if (newlineIndex !== -1) normalized += '\n';
+      if (newlineIndex === -1) break;
+      next = newlineIndex + 1;
+    }
+
+    const removedBefore = (index: number) => {
+      let removedTotal = 0;
+      for (const line of lines) {
+        if (index <= line.start) break;
+        const within = index - line.start;
+        if (within <= 0) continue;
+        removedTotal += within >= line.removed ? line.removed : within;
+      }
+      return removedTotal;
+    };
+
+    const fixedStart = Math.max(0, selectionStart - removedBefore(selectionStart));
+    const fixedEnd = Math.max(0, selectionEnd - removedBefore(selectionEnd));
+    return { value: normalized, selectionStart: fixedStart, selectionEnd: fixedEnd };
+  };
+
+  const handleInstructionChange = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => {
+    const el = e.currentTarget;
+    const raw = el.value;
+    const selectionStart = el.selectionStart ?? raw.length;
+    const selectionEnd = el.selectionEnd ?? raw.length;
+    const normalized = stripLineLeadingWhitespace(raw, selectionStart, selectionEnd);
+
+    setAgentForm((s) => ({ ...s, instruction: normalized.value }));
+
+    requestAnimationFrame(() => {
+      el.selectionStart = normalized.selectionStart;
+      el.selectionEnd = normalized.selectionEnd;
+    });
+  }, []);
+
   const submitAgent = async () => {
     setMessage(null);
     if (!agentForm.name.trim()) {
@@ -613,6 +670,7 @@ export default function AgentManagementPage() {
                   <option value="test">test（测试）</option>
                   <option value="build">build（构建）</option>
                   <option value="ops">ops（运维）</option>
+                  <option value="project">project（项目）</option>
                 </select>
                 <button className="agent-primary-btn" onClick={openCreateAgent}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
@@ -733,9 +791,9 @@ export default function AgentManagementPage() {
                     <div className="k">创建时间</div>
                     <div className="v">{selectedAgent.createdAt}</div>
                     <div className="k">描述</div>
-                    <div className="v">{selectedAgent.description || '--'}</div>
+                    <div className="v agent-multiline">{selectedAgent.description || '--'}</div>
                     <div className="k">指令</div>
-                    <div className="v">{selectedAgent.instruction || '--'}</div>
+                    <div className="v agent-multiline">{selectedAgent.instruction || '--'}</div>
                   </div>
 
                   <div className="agent-divider" />
@@ -831,16 +889,18 @@ export default function AgentManagementPage() {
                 <option value="test">test（测试）</option>
                 <option value="build">build（构建）</option>
                 <option value="ops">ops（运维）</option>
+                <option value="project">project（项目）</option>
               </select>
-              <input
-                value={agentForm.instruction}
-                onChange={(e) => setAgentForm((s) => ({ ...s, instruction: e.target.value }))}
-                placeholder="指令（可选）"
-              />
               <textarea
                 value={agentForm.description}
                 onChange={(e) => setAgentForm((s) => ({ ...s, description: e.target.value }))}
                 placeholder="描述（可选）"
+              />
+              <textarea
+                className="agent-textarea-instruction"
+                value={agentForm.instruction}
+                onChange={handleInstructionChange}
+                placeholder="指令（可选）"
               />
             </div>
             <div className="agent-modal-actions">
